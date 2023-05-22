@@ -14,10 +14,7 @@ def process_html(vector_store, file: UploadFile, stats_db):
 
 def get_html(url):
     response = requests.get(url)
-    if response.status_code == 200:
-        return response.text
-    else:
-        return None
+    return response.text if response.status_code == 200 else None
 
 def slugify(text):
     text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')

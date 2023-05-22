@@ -110,8 +110,7 @@ async def filter_file(file: UploadFile, supabase, vector_store, stats_db):
 
 @app.post("/upload")
 async def upload_file(file: UploadFile):
-    message = await filter_file(file, supabase, vector_store, stats_db=None)
-    return message
+    return await filter_file(file, supabase, vector_store, stats_db=None)
 
 @app.post("/chat/")
 async def chat_endpoint(chat_message: ChatMessage):
@@ -149,15 +148,14 @@ async def crawl_endpoint(crawl_website: CrawlWebsite):
 
     # Pass the SpooledTemporaryFile to UploadFile
     file = UploadFile(file=spooled_file, filename=file_name)
-    message = await filter_file(file, supabase, vector_store, stats_db=None)
-    return message
+    return await filter_file(file, supabase, vector_store, stats_db=None)
 
 @app.get("/explore")
 async def explore_endpoint():
     response = supabase.table("documents").select("name:metadata->>file_name, size:metadata->>file_size", count="exact").execute()
     documents = response.data  # Access the data from the response
     # Convert each dictionary to a tuple of items, then to a set to remove duplicates, and then back to a dictionary
-    unique_data = [dict(t) for t in set(tuple(d.items()) for d in documents)]
+    unique_data = [dict(t) for t in {tuple(d.items()) for d in documents}]
     # Sort the list of documents by size in decreasing order
     unique_data.sort(key=lambda x: int(x['size']), reverse=True)
 
